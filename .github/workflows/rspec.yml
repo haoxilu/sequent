@@ -13,7 +13,6 @@ env:
   POSTGRES_USERNAME: sequent
   POSTGRES_PASSWORD: sequent
   POSTGRES_DB: sequent_spec_db
-  ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
 
 jobs:
   build:
@@ -54,8 +53,14 @@ jobs:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
           cache-version: ${{ matrix.ruby-version }}-${{ matrix.active-star-version }}
+        env:
+          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
       - name: Setup database
         run: |
           bundle exec rake db:create
+        env:
+          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
       - name: Run tests
         run: bundle exec rspec
+        env:
+          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}

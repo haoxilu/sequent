@@ -40,6 +40,36 @@ describe Sequent::Support::Database do
         expect(Sequent::ApplicationRecord.connection).to be_active
       end
     end
+
+    describe '.read_config' do
+      before do
+        Sequent.configuration.database_config_directory = "spec/fixtures"
+      end
+
+      context "without pg_url config" do
+        it "returns the proper database configurations" do
+          allow(YAML).to receive(:load).with(anything).and_return({ test: db_config })
+          configs = described_class.read_config(:test)
+          expect(configs[:database]).to eq(database_name)
+        end
+      end
+
+      context "with pg_url config" do
+        let(:db_config) do
+          test_config = Database.test_config
+
+          {
+            "url" => "postgresql://#{test_config['username']}:#{test_config['password']}@#{test_config['host']}:5432/#{test_config['database']}"
+          }
+        end
+
+        it "returns the proper database configurations" do
+          allow(YAML).to receive(:load).with(anything).and_return({ test: db_config })
+          configs = described_class.read_config(:test)
+          expect(configs[:database]).to eq(database_name)
+        end
+      end
+    end
   end
 
   context 'instance methods' do

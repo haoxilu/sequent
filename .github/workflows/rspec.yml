@@ -58,9 +58,5 @@ jobs:
       - name: Setup database
         run: |
           bundle exec rake db:create
-        env:
-          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
       - name: Run tests
         run: bundle exec rspec
-        env:
-          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}

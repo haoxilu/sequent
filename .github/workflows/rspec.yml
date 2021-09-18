@@ -20,6 +20,7 @@ jobs:
     strategy:
       matrix:
         include:
+
           - ruby-version: 3.0.0
             active-star-version: '< 6.1.5'
           - ruby-version: 3.0.0
@@ -51,6 +52,8 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
+        env:
+          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
       - name: Setup database
         run: |
           bundle exec rake db:create

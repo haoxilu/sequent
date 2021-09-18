@@ -51,9 +51,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby-version }}
-          bundler-cache: true
-        env:
-          ACTIVE_STAR_VERSION: ${{ matrix.active-star-version }}
+          bundler-cache: false
       - name: Setup database
         run: |
           bundle exec rake db:create

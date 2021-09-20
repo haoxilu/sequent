@@ -1,5 +1,7 @@
 require 'active_support/hash_with_indifferent_access'
 
+class ActiveRecordVersionNotSupportedError< StandardError; end
+
 module Sequent
   module Support
     # Offers support operations for a postgres database.
@@ -8,6 +10,7 @@ module Sequent
     # take in a database configuration). Instance methods assume that a database
     # connection yet is established.
     class Database
+
       attr_reader :db_config
 
       def self.connect!(env)
@@ -20,7 +23,16 @@ module Sequent
 
         database_yml = File.join(Sequent.configuration.database_config_directory, 'database.yml')
         config = YAML.load(ERB.new(File.read(database_yml)).result)[env]
-        ActiveRecord::Base.resolve_config_for_connection(config)
+
+        # ActiveRecord::Base.resolve_config_for_connection is not public method in activerecord-6.1.4
+        # https://apidock.com/rails/v6.1.3.1/ActiveRecord/ConnectionHandling/resolve_config_for_connection
+        if ActiveRecord::Base.respond_to?(:resolve_config_for_connection)
+          ActiveRecord::Base.resolve_config_for_connection(config)
+        elsif ActiveRecord::Base.configurations.respond_to?(:resolve)
+          ActiveRecord::Base.configurations.resolve(config).configuration_hash.with_indifferent_access
+        else
+          raise ActiveRecordVersionNotSupportedError, "Unsupported ActiveRecord version"
+        end
       end
 
       def self.create!(db_config)
